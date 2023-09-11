@@ -9,6 +9,12 @@ class EditingPage extends StatelessWidget {
       home: Scaffold(
           appBar: AppBar(
             title: const Text('Add'),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.save),
+              )
+            ],
           ),
           body: SingleChildScrollView(
             child: Column(
@@ -36,7 +42,7 @@ class EditingPage extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontFamily: 'Times new Roman'),
                 ),
                 SizedBox(
-                  height: 400,
+                  height: 800,
                   child: TextFormField(
                     decoration: const InputDecoration(
                       label: Text('Enter the title',
@@ -47,7 +53,6 @@ class EditingPage extends StatelessWidget {
                     maxLines: 8,
                   ),
                 ),
-                ElevatedButton(onPressed: () {}, child: Text('Save'))
               ],
             ),
           )),
