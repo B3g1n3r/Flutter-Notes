@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:helloworld/editingpage.dart';
-import 'package:helloworld/new_notes.dart';
+import 'package:notes/editing_page.dart';
+import 'package:notes/new_notes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MainScreen(),
     );
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key? key}) : super(key: key);
+  const MainScreen({Key? key}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
