@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notes/editing_page.dart';
+import 'package:helloworld/editingpage.dart';
+import 'package:helloworld/new_notes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,23 +13,36 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const MainScreen(),
+      home: MainScreen(),
     );
   }
 }
 
-class MainScreen extends StatelessWidget {
-  const MainScreen({Key? key}) : super(key: key);
+class MainScreen extends StatefulWidget {
+  MainScreen({Key? key}) : super(key: key);
+
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  static List<CardItem> cardList = [
+    CardItem(title: 'Card 1', content: 'Content 1'),
+    CardItem(title: 'Card 2', content: 'Content 2'),
+    CardItem(title: 'Card 3', content: 'Content 3'),
+  ];
+
+  void addNewItem(String title, String content) {
+    CardItem newItem = CardItem(title: title, content: content);
+    setState(
+      () {
+        cardList.add(newItem);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<CardItem> cardList = [
-      CardItem(title: 'Card 1', content: 'Content 1'),
-      CardItem(title: 'Card 2', content: 'Content 2'),
-      CardItem(title: 'Card 3', content: 'Content 3'),
-      CardItem(title: 'Card 4', content: 'Content 4'),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Main Screen'),
@@ -46,35 +60,15 @@ class MainScreen extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const EditingPage()),
+            MaterialPageRoute(
+              builder: (context) => EditingPage(
+                cardlist: [],
+                addNewItem: addNewItem,
+              ),
+            ),
           );
         },
         child: const Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-class CardItem {
-  final String title;
-  final String content;
-
-  CardItem({required this.title, required this.content});
-}
-
-class CardItemWidget extends StatelessWidget {
-  final CardItem cardItem;
-
-  const CardItemWidget({Key? key, required this.cardItem}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.all(8.0),
-      child: ListTile(
-        title: Text(cardItem.title),
-        subtitle: Text(cardItem.content),
       ),
     );
   }
