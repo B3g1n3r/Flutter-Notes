@@ -1,61 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:helloworld/new_notes.dart';
 
 class EditingPage extends StatelessWidget {
-  const EditingPage({super.key});
+  final List<CardItem> cardlist;
+  final Function(String, String) addNewItem; // Function to add a new item
+
+  EditingPage({super.key, required this.cardlist, required this.addNewItem});
+
+  final TextEditingController titleEditor = TextEditingController();
+  final TextEditingController contentEditor = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Add'),
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.save),
-              )
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add'),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              final String title = titleEditor.text;
+              final String content = contentEditor.text;
+
+              if (title.isNotEmpty && content.isNotEmpty) {
+                // Call the addNewItem function with title and content
+                addNewItem(title, content);
+                showSnackBar(context, 'Saved');
+                Navigator.pop(context);
+              } else {
+                showSnackBar(context, 'Please fill the contents');
+              }
+            },
+            icon: const Icon(Icons.save_alt_outlined),
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 30,
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 30,
+            ),
+            TextFormField(
+              controller: titleEditor,
+              decoration: const InputDecoration(
+                hintText: '  Enter the title',
+                labelStyle: TextStyle(
+                  fontSize: 20,
+                  fontFamily: 'Times new Roman',
+                  color: Colors.grey,
                 ),
-                const Text(
-                  'Title',
-                  style: TextStyle(fontSize: 20, fontFamily: 'Times new Roman'),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      label: Text('Enter the title',
-                          style: TextStyle(
-                              fontSize: 20, fontFamily: 'Times new Roman')),
-                      border: OutlineInputBorder()),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                const Text(
-                  'Title',
-                  style: TextStyle(fontSize: 20, fontFamily: 'Times new Roman'),
-                ),
-                SizedBox(
-                  height: 800,
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      label: Text('Enter the title',
-                          style: TextStyle(
-                              fontSize: 20, fontFamily: 'Times new Roman')),
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 8,
+              ),
+            ),
+            SizedBox(
+              height: 900,
+              child: TextFormField(
+                controller: contentEditor,
+                decoration: const InputDecoration(
+                  hintText: '  Content',
+                  labelStyle: TextStyle(
+                    fontSize: 20,
+                    fontFamily: 'Times new Roman',
                   ),
                 ),
-              ],
+                maxLines: 8,
+              ),
             ),
-          )),
+          ],
+        ),
+      ),
     );
+  }
+
+  // Helper method to show a snackbar message
+  void showSnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
