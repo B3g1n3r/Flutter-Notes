@@ -17,10 +17,10 @@ class CardItemWidget extends StatelessWidget {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       child: ListTile(
         title: Text(cardItem.title),
         subtitle: Text(cardItem.content),
-        
       ),
     );
   }
