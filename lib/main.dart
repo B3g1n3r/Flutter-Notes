@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:helloworld/editingpage.dart';
-import 'package:helloworld/new_notes.dart';
+import 'package:notes/editingpage.dart';
+import 'package:notes/new_notes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
