@@ -5,6 +5,16 @@ class CardItem {
   final String content;
 
   CardItem({required this.title, required this.content});
+
+  String toJson() {
+    final Map<String, dynamic> data = {'title': title, 'content': content};
+    return jsonEncode(data);
+  }
+
+  factory CardItem.fromJson(String json) {
+    Map<String, dynamic> data = jsonDecode(json);
+    return CardItem(title: data['title'], content: data['content']);
+  }
 }
 
 class CardItemWidget extends StatelessWidget {
@@ -19,8 +29,10 @@ class CardItemWidget extends StatelessWidget {
       margin: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       child: ListTile(
-        title: Text(cardItem.title),
-        subtitle: Text(cardItem.content),
+        title: Text(cardItem.title,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(cardItem.content,
+            maxLines: 6, overflow: TextOverflow.ellipsis),
       ),
     );
   }
