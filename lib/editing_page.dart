@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notes/new_notes.dart';
 
+
 class EditingPage extends StatelessWidget {
   final List<CardItem> cardlist;
   final Function(String, String) addNewItem; // Function to add a new item
