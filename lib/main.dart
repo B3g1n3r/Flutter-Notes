@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:notes/editing_page.dart';
-import 'package:notes/new_notes.dart';
+import 'package:helloworld/editingpage.dart';
+import 'package:helloworld/new_notes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
+import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,11 +32,7 @@ class MainScreen extends StatefulWidget {
 enum SampleItem { one, two }
 
 class _MainScreenState extends State<MainScreen> {
-  static List<CardItem> cardList = [
-    CardItem(title: 'Card 1', content: 'Content 1'),
-    CardItem(title: 'Card 2', content: 'Content 2'),
-    CardItem(title: 'Card 3', content: 'Content 3'),
-  ];
+  static List<CardItem> cardList = [];
 
   @override
   void initState() {
@@ -81,7 +79,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: const Icon(Icons.search, color: Colors.black),
           ),
           PopupMenuButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.menu,
                 color: Colors.black,
               ),
@@ -109,17 +107,22 @@ class _MainScreenState extends State<MainScreen> {
         future: loadCardList(),
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-              ),
-              itemBuilder: (context, index) {
-                return CardItemWidget(cardItem: cardList[index]);
-              },
+            return StaggeredGridView.countBuilder(
+              crossAxisCount: 2,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              padding: const EdgeInsets.all(4),
               itemCount: cardList.length,
+              itemBuilder: (context, index) {
+                final cardItem = cardList[index];
+                return CardItemWidget(cardItem: cardItem);
+              },
+              staggeredTileBuilder: (index) {
+                return StaggeredTile.fit(1);
+              },
             );
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(
                 color: Colors.green,
               ),
