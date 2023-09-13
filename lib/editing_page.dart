@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notes/new_notes.dart';
-
+import 'package:helloworld/new_notes.dart';
 
 class EditingPage extends StatelessWidget {
   final List<CardItem> cardlist;
