@@ -8,7 +8,6 @@ Welcome to the Flutter Notes App with SharedPreferences repository! This Flutter
 - [Technologies Used](#technologies-used)
 - [Usage](#usage)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
@@ -43,6 +42,3 @@ Contributions are welcome! Here's how you can contribute to this project:
 
 Please ensure your code follows the project's coding style and conventions.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
