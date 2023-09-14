@@ -1,86 +1,209 @@
 import 'package:flutter/material.dart';
 import 'package:notes/new_notes.dart';
+import 'package:notes/editingpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
+import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
 
-class EditingPage extends StatelessWidget {
-  final List<CardItem> cardlist;
-  final Function(String, String) addNewItem; // Function to add a new item
+void main() {
+  runApp(const MyApp());
+}
 
-  EditingPage({super.key, required this.cardlist, required this.addNewItem});
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-  final TextEditingController titleEditor = TextEditingController();
-  final TextEditingController contentEditor = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
+
+  @override
+  //ignore
+  _MainScreenState createState() => _MainScreenState();
+}
+
+enum SampleItem { one, two }
+
+class _MainScreenState extends State<MainScreen> {
+  static List<CardItem> cardList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadCardList();
+  }
+
+  void addNewItem(String title, String content) {
+    CardItem newItem = CardItem(title: title, content: content);
+    setState(
+      () {
+        cardList.add(newItem);
+        saveCardList();
+      },
+    );
+  }
+
+  Future<void> loadCardList() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    List<String>? cardListJson = sharedPreferences.getStringList('cardlist');
+    if (cardListJson != null) {
+      cardList = cardListJson.map((e) => CardItem.fromJson(e)).toList();
+    }
+  }
+
+  Future<bool?> confirmDelete(BuildContext context) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this card'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void saveCardList() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    List<String> cardListJson = cardList.map((e) => e.toJson()).toList();
+    await sharedPreferences.setStringList('cardlist', cardListJson);
+  }
+
+  void deleteCard(CardItem cardItem) {
+    setState(() {
+      cardList.remove(cardItem);
+    });
+    saveCardList();
+  }
+
+  SampleItem? selectedMenu;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add'),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back),
-        ),
+        title: const Text('Notes',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
         actions: [
           IconButton(
-            onPressed: () {
-              final String title = titleEditor.text;
-              final String content = contentEditor.text;
-
-              if (title.isNotEmpty && content.isNotEmpty) {
-                // Call the addNewItem function with title and content
-                addNewItem(title, content);
-                showSnackBar(context, 'Saved');
-                Navigator.pop(context);
-              } else {
-                showSnackBar(context, 'Please fill the contents');
-              }
-            },
-            icon: const Icon(Icons.save_alt_outlined),
+            onPressed: () {},
+            icon: const Icon(Icons.search, color: Colors.black),
           ),
+          PopupMenuButton(
+              icon: const Icon(
+                Icons.menu,
+                color: Colors.black,
+              ),
+              initialValue: selectedMenu,
+              onSelected: (SampleItem item) {
+                setState(() {
+                  selectedMenu = item;
+                });
+              },
+              itemBuilder: (BuildContext context) {
+                return <PopupMenuEntry<SampleItem>>[
+                  const PopupMenuItem(
+                    value: SampleItem.one,
+                    child: Text('data'),
+                  ),
+                  const PopupMenuItem(
+                    value: SampleItem.two,
+                    child: Text('data'),
+                  ),
+                ];
+              }),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 30,
-            ),
-            TextFormField(
-              controller: titleEditor,
-              decoration: const InputDecoration(
-                hintText: '  Enter the title',
-                labelStyle: TextStyle(
-                  fontSize: 20,
-                  fontFamily: 'Times new Roman',
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 900,
-              child: TextFormField(
-                controller: contentEditor,
-                decoration: const InputDecoration(
-                  hintText: '  Content',
-                  labelStyle: TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'Times new Roman',
+      body: FutureBuilder(
+        future: loadCardList(),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return StaggeredGridView.countBuilder(
+              crossAxisCount: 2,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              padding: const EdgeInsets.all(4),
+              itemCount: cardList.length,
+              itemBuilder: (context, index) {
+                final cardItem = cardList[index];
+                return Dismissible(
+                  key: Key(cardItem.title),
+                  onDismissed: (direction) {
+                    confirmDelete(context).then((value) {
+                      if (value == true) {
+                        deleteCard(cardItem);
+                      } else {
+                        setState(() {});
+                      }
+                    });
+                  },
+                  direction: DismissDirection.startToEnd,
+                  child: InkWell(
+                    child: Card(
+                      elevation: 4,
+                      margin: const EdgeInsets.all(8),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                      child: ListTile(
+                        title: Text(cardItem.title,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(cardItem.content,
+                            maxLines: 6, overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
                   ),
-                ),
-                maxLines: 8,
+                );
+              },
+              staggeredTileBuilder: (index) {
+                return const StaggeredTile.fit(1);
+              },
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.green,
+              ),
+            );
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditingPage(
+                cardlist: [],
+                addNewItem: addNewItem,
               ),
             ),
-          ],
-        ),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
-  }
-
-  // Helper method to show a snackbar message
-  void showSnackBar(BuildContext context, String message) {
-    final snackBar = SnackBar(content: Text(message));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
