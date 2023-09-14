@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MainScreen(),
     );
@@ -58,10 +58,43 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  Future<bool?> confirmDelete(BuildContext context) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this card'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void saveCardList() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     List<String> cardListJson = cardList.map((e) => e.toJson()).toList();
     await sharedPreferences.setStringList('cardlist', cardListJson);
+  }
+
+  void deleteCard(CardItem cardItem) {
+    setState(() {
+      cardList.remove(cardItem);
+    });
+    saveCardList();
   }
 
   SampleItem? selectedMenu;
@@ -115,10 +148,37 @@ class _MainScreenState extends State<MainScreen> {
               itemCount: cardList.length,
               itemBuilder: (context, index) {
                 final cardItem = cardList[index];
-                return CardItemWidget(cardItem: cardItem);
+                return Dismissible(
+                  key: Key(cardItem.title),
+                  onDismissed: (direction) {
+                    confirmDelete(context).then((value) {
+                      if (value == true) {
+                        deleteCard(cardItem);
+                      } else {
+                        setState(() {});
+                      }
+                    });
+                  },
+                  direction: DismissDirection.startToEnd,
+                  child: InkWell(
+                    child: Card(
+                      elevation: 4,
+                      margin: const EdgeInsets.all(8),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                      child: ListTile(
+                        title: Text(cardItem.title,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(cardItem.content,
+                            maxLines: 6, overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                  ),
+                );
               },
               staggeredTileBuilder: (index) {
-                return StaggeredTile.fit(1);
+                return const StaggeredTile.fit(1);
               },
             );
           } else {
