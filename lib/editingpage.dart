@@ -1,22 +1,41 @@
 import 'package:flutter/material.dart';
 
-class EditingPage extends StatelessWidget {
-  final Function(String, String) addNewItem;
-  String title1;
-  String content2;
-  EditingPage(
-      {Key? key,
-      required this.title1,
-      required this.content2,
-      required this.addNewItem});
+class EditingPage extends StatefulWidget {
+  final Function(String, String) updateItem;
+  final String title1;
+  final String content2;
 
-  final TextEditingController titleEditor = TextEditingController();
-  final TextEditingController contentEditor = TextEditingController();
+  EditingPage({
+    Key? key,
+    required this.title1,
+    required this.content2,
+    required this.updateItem,
+  }) : super(key: key);
+
+  @override
+  _EditingPageState createState() => _EditingPageState();
+}
+
+class _EditingPageState extends State<EditingPage> {
+  TextEditingController titleEditor = TextEditingController();
+  TextEditingController contentEditor = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    titleEditor.text = widget.title1;
+    contentEditor.text = widget.content2;
+  }
+
+  @override
+  void dispose() {
+    titleEditor.dispose();
+    contentEditor.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    titleEditor.text = title1;
-    contentEditor.text = content2;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -44,7 +63,7 @@ class EditingPage extends StatelessWidget {
               final String content = contentEditor.text;
 
               if (title.isNotEmpty && content.isNotEmpty) {
-                addNewItem(title, content);
+                widget.updateItem(title, content);
                 showSnackBar(context, 'Note Saved');
                 Navigator.pop(context);
               } else {
@@ -65,7 +84,7 @@ class EditingPage extends StatelessWidget {
           children: [
             const SizedBox(height: 20),
             TextFormField(
-              initialValue: titleEditor.text,
+              controller: titleEditor,
               readOnly: false,
               style: const TextStyle(
                 fontSize: 20,
@@ -81,7 +100,7 @@ class EditingPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             TextFormField(
-              initialValue: contentEditor.text,
+              controller: contentEditor,
               style: const TextStyle(fontSize: 18),
               maxLines: 11,
               decoration: InputDecoration(
