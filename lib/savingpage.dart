@@ -15,7 +15,7 @@ class SavingPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Add Note',
+          'Edit note',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
